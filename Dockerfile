@@ -40,7 +40,8 @@ RUN dpkg --add-architecture i386 \
         xvfb \
         lib32gcc-s1 \
         lib32stdc++6 \
-        libgl1-mesa-glx:i386 \
+        libgl1:i386 \
+        libgl1-mesa-dri:i386 \
         ca-certificates \
         locales \
     # Generate locale (prevents some character encoding issues in logs)

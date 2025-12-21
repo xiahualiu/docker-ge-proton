@@ -1,0 +1,36 @@
+services:
+  game-server:
+    build:
+      context: .
+      args:
+        STEAM_USER: "steam"
+        STEAM_HOME: "/home/steam"
+        STEAM_USER_UID: "1000"
+        STEAM_USER_GID: "1000"
+        STEAMCMD_DIR: "/home/steam/steamcmd"
+        STEAM_APP_DIR: "/home/steam/server"
+        STEAM_COMPAT_DATA_PATH: "/home/steam/proton-compat"
+        PROTON_VERSION: "GE-Proton10-26"
+
+    image: custom-proton-server:latest
+    container_name: game-name-server
+    restart: unless-stopped
+    ports:
+      - "27015:27015/udp" # Default Steam Port
+      - "27015:27015/tcp" # Default Steam Port
+      - "8211:8211/udp" # Game Port(s)
+    environment:
+      # Game App ID (Palworld as example)
+      - STEAM_APP_ID=2394010
+      
+      # Executable relative to the installed game folder
+      - GAME_EXECUTABLE=PalServer.exe
+      
+      # Startup arguments (check specific game documentation)
+      - GAME_ARGS=-useperfthreads -NoAsyncLoadingThread -UseMultithreadForDS
+    volumes:
+      # Persist the game files so we don't redownload every restart
+      - ./game_data:/home/steam/server
+      
+      # Persist the "Windows" environment (Save files usually live here)
+      - ./proton_data:/home/steam/proton-compat

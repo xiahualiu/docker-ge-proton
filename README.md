@@ -4,12 +4,11 @@ A minimal Ubuntu-based Docker image that configures SteamCMD and GE-Proton for r
 
 ## Features
 
-- **Ubuntu 24.04** base image.
-- **SteamCMD** pre-installed for downloading game servers.
-- **GE-Proton** for Windows compatibility layer.
-- **Xvfb** virtual framebuffer for headless operation.
-- Non-root user setup for security.
-- Volume support for persistent game data.
+- **Ubuntu 24.04** base image
+- **SteamCMD** pre-installed for downloading game servers
+- **GE-Proton** for Windows compatibility layer
+- Non-root user setup for security
+- Volume support for persistent game data
 
 ## Quick Start
 
@@ -32,28 +31,26 @@ A minimal Ubuntu-based Docker image that configures SteamCMD and GE-Proton for r
 
 ### Environment Variables
 
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `STEAM_APP_ID` | Yes | Steam App ID for the dedicated server | `2394010` |
-| `GAME_EXECUTABLE` | Yes | Path to the game executable (relative to install dir) | `PalServer.exe` |
-| `GAME_ARGS` | No | Command-line arguments for the game server | `-useperfthreads` |
+| Variable          | Required | Description                                           |
+| ----------------- | -------- | ----------------------------------------------------- |
+| `STEAM_APP_ID`    | Yes      | Steam App ID for the dedicated server                 |
+| `GAME_EXECUTABLE` | Yes      | Path to the game executable (relative to install dir) |
+| `GAME_ARGS`       | No       | Command-line arguments for the game server            |
 
 ### Build Arguments
 
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `STEAM_USER` | `steam` | Username for the non-root user |
-| `STEAM_USER_UID` | `1000` | UID for the steam user |
-| `STEAM_USER_GID` | `1000` | GID for the steam group |
-| `PROTON_VERSION` | `GE-Proton10-26` | GE-Proton release version |
+| Argument         | Default          | Description                    |
+| ---------------- | ---------------- | ------------------------------ |
+| `STEAM_USER`     | `steam`          | Username for the non-root user |
+| `STEAM_USER_UID` | `1000`           | UID for the steam user         |
+| `STEAM_USER_GID` | `1000`           | GID for the steam group        |
+| `PROTON_VERSION` | `GE-Proton10-26` | GE-Proton release version      |
 
 ### Volumes
 
-| Container Path | Description |
-|----------------|-------------|
-| `/home/steam/server` | Game server installation files |
-| `/home/steam/proton-compat` | Proton prefix (Windows environment, save files) |
-
+| Container Path       | Host Path     | Description                             |
+| -------------------- | ------------- | --------------------------------------- |
+| `/home/steam/server` | `./game_data` | Game server installation and save files |
 
 ## Example: Enshrouded Server
 
@@ -62,38 +59,27 @@ services:
   enshrouded-server:
     build:
       context: .
-      args:
-        STEAM_USER: "steam"
-        STEAM_HOME: "/home/steam"
-        STEAM_USER_UID: "1000"
-        STEAM_USER_GID: "1000"
-        STEAMCMD_DIR: "/home/steam/steamcmd"
-        STEAM_APP_DIR: "/home/steam/server"
-        STEAM_COMPAT_DATA_PATH: "/home/steam/proton-compat"
-        PROTON_VERSION: "GE-Proton10-26"
-
     image: enshrouded-server:latest
     container_name: enshrouded-server
-    restart: unless-stopped
+    user: "1000:1000"
     ports:
-      - "15637:15637/udp" # Query port
-      - "27015:27015/udp" # Steam port
+      - "15637:15637/udp"
+      - "27015:27015/udp"
     environment:
       - STEAM_APP_ID=2278520
       - GAME_EXECUTABLE=enshrouded_server.exe
     volumes:
       - ./game_data:/home/steam/server
-      - ./proton_data:/home/steam/proton-compat
 ```
 
 ## Building the Image
 
 ```bash
 # Build with default settings
-docker build -t enshrouded_server .
+docker build -t ge-proton-server .
 
 # Build with custom Proton version
-docker build --build-arg PROTON_VERSION=GE-Proton10-25 -t enshrouded-server .
+docker build --build-arg PROTON_VERSION=GE-Proton10-25 -t ge-proton-server .
 ```
 
 ## Finding Steam App IDs
@@ -109,7 +95,7 @@ docker build --build-arg PROTON_VERSION=GE-Proton10-25 -t enshrouded-server .
 Ensure your volume directories have correct ownership:
 
 ```bash
-sudo chown -R 1000:1000 ./game_data ./proton_data
+sudo chown -R 1000:1000 ./game_data
 ```
 
 ### Server Not Starting
@@ -119,10 +105,6 @@ Check container logs:
 ```bash
 docker compose logs -f
 ```
-
-### Proton Compatibility
-
-Not all Windows games work with Proton. Check [ProtonDB](https://www.protondb.com/) for compatibility reports.
 
 ## License
 

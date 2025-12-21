@@ -54,49 +54,6 @@ A minimal Ubuntu-based Docker image that configures SteamCMD and GE-Proton for r
 | `/home/steam/server` | Game server installation files |
 | `/home/steam/proton-compat` | Proton prefix (Windows environment, save files) |
 
-## Example: Palworld Server
-
-```yaml
-services:
-  palworld-server:
-    build:
-      context: .
-    image: palworld-server:latest
-    container_name: palworld-server
-    restart: unless-stopped
-    ports:
-      - "8211:8211/udp"
-      - "27015:27015/udp"
-    environment:
-      - STEAM_APP_ID=2394010
-      - GAME_EXECUTABLE=PalServer.exe
-      - GAME_ARGS=-useperfthreads -NoAsyncLoadingThread -UseMultithreadForDS
-    volumes:
-      - ./game_data:/home/steam/server
-      - ./proton_data:/home/steam/proton-compat
-```
-
-## Example: V Rising Server
-
-```yaml
-services:
-  vrising-server:
-    build:
-      context: .
-    image: vrising-server:latest
-    container_name: vrising-server
-    restart: unless-stopped
-    ports:
-      - "9876:9876/udp"
-      - "9877:9877/udp"
-    environment:
-      - STEAM_APP_ID=1829350
-      - GAME_EXECUTABLE=VRisingServer.exe
-      - GAME_ARGS=-persistentDataPath save-data
-    volumes:
-      - ./game_data:/home/steam/server
-      - ./proton_data:/home/steam/proton-compat
-```
 
 ## Example: Enshrouded Server
 
@@ -105,16 +62,25 @@ services:
   enshrouded-server:
     build:
       context: .
+      args:
+        STEAM_USER: "steam"
+        STEAM_HOME: "/home/steam"
+        STEAM_USER_UID: "1000"
+        STEAM_USER_GID: "1000"
+        STEAMCMD_DIR: "/home/steam/steamcmd"
+        STEAM_APP_DIR: "/home/steam/server"
+        STEAM_COMPAT_DATA_PATH: "/home/steam/proton-compat"
+        PROTON_VERSION: "GE-Proton10-26"
+
     image: enshrouded-server:latest
     container_name: enshrouded-server
     restart: unless-stopped
     ports:
-      - "15636:15636/udp"
-      - "15637:15637/udp"
+      - "15637:15637/udp" # Query port
+      - "27015:27015/udp" # Steam port
     environment:
-      - STEAM_APP_ID=2430930
+      - STEAM_APP_ID=2278520
       - GAME_EXECUTABLE=enshrouded_server.exe
-      - GAME_ARGS=-log_dir logs -public 1 -port 15636 -queryport 15637 -slotcount 16
     volumes:
       - ./game_data:/home/steam/server
       - ./proton_data:/home/steam/proton-compat
@@ -124,10 +90,10 @@ services:
 
 ```bash
 # Build with default settings
-docker build -t palworld-server .
+docker build -t enshrouded_server .
 
 # Build with custom Proton version
-docker build --build-arg PROTON_VERSION=GE-Proton10-25 -t palworld-server .
+docker build --build-arg PROTON_VERSION=GE-Proton10-25 -t enshrouded-server .
 ```
 
 ## Finding Steam App IDs

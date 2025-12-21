@@ -49,9 +49,19 @@ RUN dpkg --add-architecture i386 \
     # Clean up to keep image size down
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Create the 'steam' user and group
-RUN groupadd -g ${STEAM_USER_GID} ${STEAM_USER} \
-    && useradd -m -d ${STEAM_HOME} -s /bin/bash -u ${STEAM_USER_UID} -g ${STEAM_USER_GID} ${STEAM_USER}
+# 3. Create the 'steam' user and group (replace any conflicting UID/GID)
+RUN set -eux; \
+    if id -u "${STEAM_USER}" >/dev/null 2>&1; then userdel -r "${STEAM_USER}"; fi; \
+    if getent passwd "${STEAM_USER_UID}" >/dev/null; then \
+        old_user=$(getent passwd "${STEAM_USER_UID}" | cut -d: -f1); \
+        userdel -r "${old_user}"; \
+    fi; \
+    if getent group "${STEAM_USER_GID}" >/dev/null; then \
+        old_group=$(getent group "${STEAM_USER_GID}" | cut -d: -f1); \
+        groupdel "${old_group}"; \
+    fi; \
+    groupadd -g ${STEAM_USER_GID} ${STEAM_USER}; \
+    useradd -m -d ${STEAM_HOME} -s /bin/bash -u ${STEAM_USER_UID} -g ${STEAM_USER_GID} ${STEAM_USER}
 
 # 4. Switch to the user to perform downloads (Security Best Practice)
 USER ${STEAM_USER}

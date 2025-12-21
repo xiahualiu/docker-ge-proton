@@ -98,6 +98,28 @@ services:
       - ./proton_data:/home/steam/proton-compat
 ```
 
+## Example: Enshrouded Server
+
+```yaml
+services:
+  enshrouded-server:
+    build:
+      context: .
+    image: enshrouded-server:latest
+    container_name: enshrouded-server
+    restart: unless-stopped
+    ports:
+      - "15636:15636/udp"
+      - "15637:15637/udp"
+    environment:
+      - STEAM_APP_ID=2430930
+      - GAME_EXECUTABLE=enshrouded_server.exe
+      - GAME_ARGS=-log_dir logs -public 1 -port 15636 -queryport 15637 -slotcount 16
+    volumes:
+      - ./game_data:/home/steam/server
+      - ./proton_data:/home/steam/proton-compat
+```
+
 ## Building the Image
 
 ```bash

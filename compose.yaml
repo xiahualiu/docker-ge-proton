@@ -1,5 +1,5 @@
 services:
-  game-server:
+  enshrouded-server:
     build:
       context: .
       args:
@@ -12,25 +12,15 @@ services:
         STEAM_COMPAT_DATA_PATH: "/home/steam/proton-compat"
         PROTON_VERSION: "GE-Proton10-26"
 
-    image: custom-proton-server:latest
-    container_name: game-name-server
+    image: enshrouded-server:latest
+    container_name: enshrouded-server
     restart: unless-stopped
     ports:
-      - "27015:27015/udp" # Default Steam Port
-      - "27015:27015/tcp" # Default Steam Port
-      - "8211:8211/udp" # Game Port(s)
+      - "15637:15637/udp" # Query port
+      - "27015:27015/udp" # Steam port
     environment:
-      # Game App ID (Palworld as example)
-      - STEAM_APP_ID=2394010
-      
-      # Executable relative to the installed game folder
-      - GAME_EXECUTABLE=PalServer.exe
-      
-      # Startup arguments (check specific game documentation)
-      - GAME_ARGS=-useperfthreads -NoAsyncLoadingThread -UseMultithreadForDS
+      - STEAM_APP_ID=2278520
+      - GAME_EXECUTABLE=enshrouded_server.exe
     volumes:
-      # Persist the game files so we don't redownload every restart
       - ./game_data:/home/steam/server
-      
-      # Persist the "Windows" environment (Save files usually live here)
       - ./proton_data:/home/steam/proton-compat

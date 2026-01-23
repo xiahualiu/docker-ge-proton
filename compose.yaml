@@ -1,5 +1,5 @@
 services:
-  game-server:
+  abiotic-factor-server:
     build:
       context: .
       args:
@@ -11,15 +11,15 @@ services:
         STEAM_APP_DIR: "/home/steam/server"
         PROTON_VERSION: "GE-Proton10-28"
 
-    image: game-server:latest
-    container_name: game-server
+    image: abiotic-factor-server:latest
+    container_name: abiotic-factor-server
     user: "1000:1000"
     ports:
-      - "YOUR_GAME_PORT:YOUR_GAME_PORT/udp" # Replace with your game's port(s)
-      # - "ANOTHER_PORT:ANOTHER_PORT/udp"   # Add more ports as needed
+      - "7777:7777/udp" # Game port
+      - "27015:27015/udp" # Steam port
     environment:
-      - STEAM_APP_ID=YOUR_STEAM_APP_ID           # Replace with your game's Steam App ID
-      - GAME_EXECUTABLE=YOUR_GAME_EXECUTABLE.exe # Replace with your game's executable
-      # - GAME_ARGS=                             # Optional: Add game arguments if needed
+      - STEAM_APP_ID=2857200
+      - GAME_EXECUTABLE=AbioticFactor/Binaries/Win64/AbioticFactorServer-Win64-Shipping.exe
+      - GAME_ARGS=-useperfthreads
     volumes:
       - ./game_data:/home/steam/server

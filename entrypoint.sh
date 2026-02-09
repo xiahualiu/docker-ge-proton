@@ -53,5 +53,8 @@ mkdir -p "${STEAM_COMPAT_DATA_PATH}"
 export SteamAppId=${STEAM_APP_ID}
 export LD_LIBRARY_PATH="${STEAM_APP_DIR}/linux64:${LD_LIBRARY_PATH}"
 
+# To use UE4SS mod
+# export WINEDLLOVERRIDES="version.dll=n,b"
+
 # Use exec with the program and its arguments split so the shell is replaced correctly.
 exec "${PROTON_EXECUTABLE_PATH}" waitforexitandrun "${STEAM_APP_DIR}/${GAME_EXECUTABLE}" ${GAME_ARGS}

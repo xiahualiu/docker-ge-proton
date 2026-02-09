@@ -20,6 +20,6 @@ services:
     environment:
       - STEAM_APP_ID=2857200
       - GAME_EXECUTABLE=AbioticFactor/Binaries/Win64/AbioticFactorServer-Win64-Shipping.exe
-      - GAME_ARGS=-useperfthreads
+      - GAME_ARGS=-useperfthreads -ServerPassword=secret -SteamServerName="Abiotic Factor Server"
     volumes:
       - ./game_data:/home/steam/server
